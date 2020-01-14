@@ -25,4 +25,3 @@ exports.formatComments = (comments, articleRef) => {
     return newObj;
   });
 };
-

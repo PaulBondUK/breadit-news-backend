@@ -1,5 +1,5 @@
-const connection = require("../db/connection");
+const database = require("../db/connection");
 
 exports.selectTopics = () => {
-  return connection.select("*").from("topics");
+  return database.select("*").from("topics");
 };

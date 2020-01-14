@@ -5,3 +5,5 @@ exports.getTopics = (req, res, next) => {
     res.status(200).send({ topics });
   });
 };
+
+// delete = res.sendStatus(204)

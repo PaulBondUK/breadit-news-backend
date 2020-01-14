@@ -1,5 +1,4 @@
 exports.up = function(knex) {
-  console.log("creating user table...");
   return knex.schema.createTable("users", usersTable => {
     usersTable
       .string("username")
