@@ -5,9 +5,23 @@ const apiRouter = require("./routers/api-router");
 
 app.use("/api/", apiRouter);
 
-// error handler
+// psql error handler
 app.use((err, req, res, next) => {
-  console.log("INSIDE ERROR HANDLER", err);
+  console.log("INSIDE ERROR HANDLER");
+  // console.log(err);
+  const psqlErrors = {
+    22003: "Invalid ID - number out of range",
+    "22P02": "Invalid ID - should be a number"
+  };
+  if (err.code) {
+    res.status(400).send({ msg: psqlErrors[err.code] });
+  } else {
+    next(err);
+  }
+});
+
+// custom errors
+app.use((err, req, res, next) => {
   res.status(err.status).send({ msg: err.msg });
 });
 

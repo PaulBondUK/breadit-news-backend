@@ -13,6 +13,16 @@ articles
  article_id | title | body | votes | topic | author | created_at 
 ------------+-------+------+-------+-------+--------+------------
 
+{
+  article_id: 1,
+  title: 'Living in the shadow of a great man',
+  body: 'I find this existence challenging',
+  votes: 100,
+  topic: 'mitch',
+  author: 'butter_bridge',
+  created_at: '2018-11-15T12:21:54.171Z'
+}
+
 comments
 
  comment_id | author | article_id | votes | created_at | body 
