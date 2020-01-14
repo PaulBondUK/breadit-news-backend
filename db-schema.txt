@@ -1,0 +1,19 @@
+topics
+
+ slug | description 
+------+-------------
+
+users
+
+ username | avatar_url | name 
+----------+------------+------
+
+articles
+
+ article_id | title | body | votes | topic | author | created_at 
+------------+-------+------+-------+-------+--------+------------
+
+comments
+
+ comment_id | author | article_id | votes | created_at | body 
+------------+--------+------------+-------+------------+------
