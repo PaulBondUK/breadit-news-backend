@@ -1,17 +1,18 @@
 const express = require("express");
 const app = express();
-
 const apiRouter = require("./routers/api-router");
+
+app.use(express.json());
 
 app.use("/api/", apiRouter);
 
 // psql error handler
 app.use((err, req, res, next) => {
-  console.log("INSIDE ERROR HANDLER");
+  // console.log("INSIDE ERROR HANDLER", err);
   // console.log(err);
   const psqlErrors = {
-    22003: "Invalid ID - number out of range",
-    "22P02": "Invalid ID - should be a number"
+    22003: "Bad Request - number out of range",
+    "22P02": "Bad Request"
   };
   if (err.code) {
     res.status(400).send({ msg: psqlErrors[err.code] });
