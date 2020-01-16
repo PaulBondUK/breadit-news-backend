@@ -25,3 +25,14 @@ exports.formatComments = (comments, articleRef) => {
     return newObj;
   });
 };
+
+exports.commentCountToNumber = arrayOfArticles => {
+  if (Array.isArray(arrayOfArticles)) {
+    return arrayOfArticles.map(article => {
+      return { ...article, comment_count: +article.comment_count };
+    });
+  } else {
+    const article = arrayOfArticles;
+    return { ...article, comment_count: +article.comment_count };
+  }
+};

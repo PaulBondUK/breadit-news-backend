@@ -1,7 +1,16 @@
 const {
+  selectArticles,
   selectArticleById,
   updateArticleById
 } = require("../models/articles-models");
+
+exports.getArticles = (req, res, next) => {
+  selectArticles(req.query.sort_by, req.query.order)
+    .then(articles => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
+};
 
 exports.getArticleById = (req, res, next) => {
   selectArticleById(req.params.article_id)

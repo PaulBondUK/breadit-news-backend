@@ -1,9 +1,27 @@
 const database = require("../db/connection");
+const { commentCountToNumber } = require("../db/utils/utils.js");
 
-exports.selectArticleById = article_id => {
+exports.selectArticles = (sortBy, order) => {
   return database("articles")
     .select("articles.*")
-    .where("articles.article_id", article_id)
+    .orderBy(sortBy || "created_at", order || "desc")
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .count({ comment_count: "comment_id" })
+    .then(articles => {
+      if (articles.length === 0) {
+        return Promise.reject({
+          msg: "No articles found",
+          status: 404
+        });
+      } else return commentCountToNumber(articles);
+    });
+};
+
+exports.selectArticleById = articleId => {
+  return database("articles")
+    .select("articles.*")
+    .where("articles.article_id", articleId)
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
     .count({ comment_count: "comment_id" })
@@ -16,8 +34,22 @@ exports.selectArticleById = article_id => {
         });
       } else {
         // spreads article to an object, changes comment_count to a string
-        return { ...article, comment_count: +article.comment_count };
+        return commentCountToNumber(article);
       }
+    });
+};
+
+exports.checkIfArticleExists = articleId => {
+  return database("articles")
+    .select("*")
+    .where("article_id", articleId)
+    .then(([article]) => {
+      if (!article) {
+        return Promise.reject({
+          msg: "Article not found",
+          status: 404
+        });
+      } else return [];
     });
 };
 

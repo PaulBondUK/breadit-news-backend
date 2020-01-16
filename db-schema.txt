@@ -27,3 +27,12 @@ comments
 
  comment_id | author | article_id | votes | created_at | body 
 ------------+--------+------------+-------+------------+------
+
+{
+  comment_id: 19,
+  author: 'butter_bridge',
+  article_id: 1,
+  votes: 0,
+  created_at: '2020-01-15T21:24:13.383Z',
+  body: 'Great article!'
+}

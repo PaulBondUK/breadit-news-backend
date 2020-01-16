@@ -2,7 +2,8 @@ const { expect } = require("chai");
 const {
   formatDates,
   makeRefObj,
-  formatComments
+  formatComments,
+  commentCountToNumber
 } = require("../db/utils/utils");
 
 describe("formatDates", () => {
@@ -207,5 +208,33 @@ describe("formatComments", () => {
       }
     ];
     expect(formatComments(comments, refObj)).to.eql(output);
+  });
+});
+
+describe("commentCountToNumber", () => {
+  it("returns an empty array when given an empty array", () => {
+    expect(commentCountToNumber([])).to.eql([]);
+  });
+  it("returns an array with a corrected article when given a single article object", () => {
+    const input = [{ comment_count: "1" }];
+    const output = [{ comment_count: 1 }];
+    expect(commentCountToNumber(input)).to.eql(output);
+  });
+  it("does not mutate the input array", () => {
+    const input = [{ comment_count: "1" }];
+    const inputCopy = [{ comment_count: "1" }];
+    const output = commentCountToNumber(input);
+    expect(input).to.eql(inputCopy);
+    expect(output[0]).to.not.equal(input[0]);
+  });
+  it("works with an array containing multiple articles", () => {
+    const input = [{ comment_count: "1" }, { comment_count: "2" }];
+    const output = [{ comment_count: 1 }, { comment_count: 2 }];
+    expect(commentCountToNumber(input)).to.eql(output);
+  });
+  it("works when passed a single article object not inside an array", () => {
+    const input = { comment_count: "1" };
+    const output = { comment_count: 1 };
+    expect(commentCountToNumber(input)).to.eql(output);
   });
 });
