@@ -11,6 +11,20 @@ const database = require("../db/connection.js");
 describe("/api", () => {
   beforeEach(() => database.seed.run());
   after(() => database.destroy());
+  describe("INVALID METHODS", () => {
+    it("STATUS:405 /:id responds status 405 when an invalid method is used", () => {
+      const invalidMethods = ["get", "put", "post", "patch", "delete"];
+      const methodPromises = invalidMethods.map(method => {
+        return request(server)
+          [method]("/api")
+          .expect(405)
+          .then(res => {
+            expect(res.body.msg).to.equal("Method not allowed");
+          });
+      });
+      return Promise.all(methodPromises);
+    });
+  });
 
   describe("/topics", () => {
     describe("GET", () => {
@@ -390,7 +404,7 @@ describe("/api", () => {
       });
     });
     describe("PATCH", () => {
-      it("PATCH:200 /:id responds with the updated article object when sent an object with a positive vote increment", () => {
+      it("PATCH:200 /:id responds with the updated article when sent a positive vote increment", () => {
         return request(server)
           .patch("/api/articles/1")
           .send({ inc_votes: 1 })
@@ -408,7 +422,7 @@ describe("/api", () => {
             expect(res.body.article.votes).to.equal(101);
           });
       });
-      it("PATCH:200 /:id responds with the updated article object when sent an object with a negative vote increment", () => {
+      it("PATCH:200 /:id responds with the updated article when sent a negative vote increment", () => {
         return request(server)
           .patch("/api/articles/1")
           .send({ inc_votes: -1 })
@@ -460,6 +474,23 @@ describe("/api", () => {
               "votes"
             );
             expect(res.body.article.votes).to.equal(101);
+          });
+      });
+      it("PATCH:200 /:id responds with the article when no vote increment is given", () => {
+        return request(server)
+          .patch("/api/articles/1")
+          .expect(200)
+          .then(res => {
+            expect(res.body.article).to.contain.keys(
+              "author",
+              "title",
+              "article_id",
+              "body",
+              "topic",
+              "created_at",
+              "votes"
+            );
+            expect(res.body.article.votes).to.equal(100);
           });
       });
     });
@@ -549,14 +580,6 @@ describe("/api", () => {
         return request(server)
           .patch("/api/articles/1")
           .send({ inc_votes: "hello" })
-          .expect(400)
-          .then(res => {
-            expect(res.body.msg).to.equal("Bad Request");
-          });
-      });
-      it("PATCH:400 /:id responds status 400 when no vote increment is given", () => {
-        return request(server)
-          .patch("/api/articles/1")
           .expect(400)
           .then(res => {
             expect(res.body.msg).to.equal("Bad Request");
@@ -762,7 +785,7 @@ describe("/api", () => {
               expect(res.body.msg).to.equal("Bad Request");
             });
         });
-        it("GET:400 /comments responds status 400 when given when given an invalid 'order' query", () => {
+        it("GET:400 /comments responds status 400 when given when given an invalid order query", () => {
           return request(server)
             .get("/api/articles/1/comments?order=disc")
             .expect(400)
@@ -770,7 +793,7 @@ describe("/api", () => {
               expect(res.body.msg).to.equal("Bad Request");
             });
         });
-        it("GET:400 /comments responds status 400 when given when given an invalid column name as a 'sort_by' query and a valid 'order' query", () => {
+        it("GET:400 /comments responds status 400 when given when given an invalid column name as a sort_by query and a valid 'order' query", () => {
           return request(server)
             .get("/api/articles/1/comments?sort_by=hello&?order=asc")
             .expect(400)
@@ -778,7 +801,7 @@ describe("/api", () => {
               expect(res.body.msg).to.equal("Bad Request");
             });
         });
-        it("GET:400 /comments responds status 400 when given when given a valid 'sort_by' query and an invalid 'order' query", () => {
+        it("GET:400 /comments responds status 400 when given when given a valid sort_by query and an invalid 'order' query", () => {
           return request(server)
             .get("/api/articles/1/comments?sort_by=votes&order=disc")
             .expect(400)
@@ -862,7 +885,7 @@ describe("/api", () => {
   describe("/comments", () => {
     describe("/:comment_id", () => {
       describe("PATCH", () => {
-        it("PATCH:200 /:id responds with the updated comment object when sent an object with a positive vote increment", () => {
+        it("PATCH:200 /:id responds with the updated comment when sent a positive vote increment", () => {
           return request(server)
             .patch("/api/comments/1")
             .send({ inc_votes: 1 })
@@ -879,7 +902,7 @@ describe("/api", () => {
               expect(res.body.comment.votes).to.equal(17);
             });
         });
-        it("PATCH:200 /:id responds with the updated comment object when sent an object with a negative vote increment", () => {
+        it("PATCH:200 /:id responds with the updated comment when sent a negative vote increment", () => {
           return request(server)
             .patch("/api/comments/2")
             .send({ inc_votes: -1 })
@@ -913,7 +936,7 @@ describe("/api", () => {
               expect(res.body.comment.votes).to.equal(-1);
             });
         });
-        it("PATCH:200 /:id responds with the updated comment object when sent an object containing a valid vote increment and an extra property", () => {
+        it("PATCH:200 /:id responds with the updated comment when sent an object containing a valid vote increment and an extra property", () => {
           return request(server)
             .patch("/api/comments/4")
             .send({ animal: "dog", inc_votes: 101 })
@@ -928,6 +951,22 @@ describe("/api", () => {
                 "created_at"
               );
               expect(res.body.comment.votes).to.equal(1);
+            });
+        });
+        it("PATCH:200 /:id responds with the comment when no vote increment is given", () => {
+          return request(server)
+            .patch("/api/comments/1")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comment).to.have.keys(
+                "comment_id",
+                "author",
+                "article_id",
+                "body",
+                "votes",
+                "created_at"
+              );
+              expect(res.body.comment.votes).to.equal(16);
             });
         });
       });
@@ -965,14 +1004,6 @@ describe("/api", () => {
             .send({
               inc_votes: "hello"
             })
-            .expect(400)
-            .then(res => {
-              expect(res.body.msg).to.equal("Bad Request");
-            });
-        });
-        it("PATCH:400 /:id responds status 400 when no vote increment is given", () => {
-          return request(server)
-            .patch("/api/comments/1")
             .expect(400)
             .then(res => {
               expect(res.body.msg).to.equal("Bad Request");

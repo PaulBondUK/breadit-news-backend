@@ -79,9 +79,14 @@ exports.checkIfArticleExists = articleId => {
 };
 
 exports.updateArticleById = (articleId, voteIncrement) => {
+  console.log("inside model");
   return database("articles")
     .where("article_id", articleId)
-    .increment({ votes: voteIncrement })
+    .modify(currentQuery => {
+      if (voteIncrement) {
+        currentQuery.increment({ votes: voteIncrement });
+      }
+    })
     .returning("*")
     .then(([article]) => {
       if (!article) {

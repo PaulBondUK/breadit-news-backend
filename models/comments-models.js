@@ -40,7 +40,11 @@ exports.insertCommentByArticleId = (articleId, author, body) => {
 exports.updateCommentById = (commentId, voteIncrement) => {
   return database("comments")
     .where("comment_id", commentId)
-    .increment({ votes: voteIncrement })
+    .modify(currentQuery => {
+      if (voteIncrement) {
+        currentQuery.increment({ votes: voteIncrement });
+      }
+    })
     .returning("*")
     .then(([comment]) => {
       if (!comment) {
