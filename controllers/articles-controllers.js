@@ -5,7 +5,12 @@ const {
 } = require("../models/articles-models");
 
 exports.getArticles = (req, res, next) => {
-  selectArticles(req.query.sort_by, req.query.order)
+  selectArticles(
+    req.query.sort_by,
+    req.query.order,
+    req.query.author,
+    req.query.topic
+  )
     .then(articles => {
       res.status(200).send({ articles });
     })
@@ -22,14 +27,8 @@ exports.getArticleById = (req, res, next) => {
 
 exports.patchArticleById = (req, res, next) => {
   updateArticleById(req.params.article_id, req.body.inc_votes)
-    .then(patchedArticle => {
-      res.status(200).send({ article: patchedArticle });
+    .then(article => {
+      res.status(200).send({ article });
     })
     .catch(next);
 };
-
-// delete = res.sendStatus(204)
-
-// join / inner join > gets all items that are in both the primary and secondary tables
-// left join > gets all items from primary table even if they have no entry in the secondary table
-// right join > gets all items from secondary table even if they don't have a reference in the primary table

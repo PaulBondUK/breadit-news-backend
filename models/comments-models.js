@@ -1,8 +1,5 @@
 const database = require("../db/connection");
-const {
-  checkIfArticleExists,
-  selectArticleById
-} = require("./articles-models.js");
+const { checkIfArticleExists } = require("./articles-models.js");
 
 exports.selectCommentsByArticleId = (articleId, sortBy, order) => {
   // errors if order string exists but is not asc or desc
@@ -37,5 +34,35 @@ exports.insertCommentByArticleId = (articleId, author, body) => {
           status: 404
         });
       } else return postedComment;
+    });
+};
+
+exports.updateCommentById = (commentId, voteIncrement) => {
+  return database("comments")
+    .where("comment_id", commentId)
+    .increment({ votes: voteIncrement })
+    .returning("*")
+    .then(([comment]) => {
+      if (!comment) {
+        return Promise.reject({
+          msg: "Comment not found",
+          status: 404
+        });
+      } else return comment;
+    });
+};
+
+exports.deleteCommentById = commentId => {
+  return database("comments")
+    .where("comment_id", commentId)
+    .del()
+    .returning("*")
+    .then(([comment]) => {
+      if (!comment) {
+        return Promise.reject({
+          msg: "Comment not found",
+          status: 404
+        });
+      } else return;
     });
 };

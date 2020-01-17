@@ -1,15 +1,41 @@
 const database = require("../db/connection");
 const { commentCountToNumber } = require("../db/utils/utils.js");
+const { emptyArrayIfAuthorExists } = require("./users-models");
+const { emptyArrayIfTopicExists } = require("./topics-models");
 
-exports.selectArticles = (sortBy, order) => {
+exports.selectArticles = (sortBy, order, author, topic) => {
   return database("articles")
     .select("articles.*")
     .orderBy(sortBy || "created_at", order || "desc")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
     .count({ comment_count: "comment_id" })
+    .modify(currentQuery => {
+      // if author query is passed, this filters by author
+      if (author) {
+        currentQuery.where("articles.author", author);
+      }
+      // if topic query is passed, this filters by topic
+      if (topic) {
+        currentQuery.where("articles.topic", topic);
+      }
+    })
     .then(articles => {
-      if (articles.length === 0) {
+      // if empty array and author query is passed, checks if author is valid
+      if (articles.length === 0 && author) {
+        return emptyArrayIfAuthorExists(author);
+      } else if (articles.length === 0 && !topic) {
+        return Promise.reject({
+          msg: "No articles found",
+          status: 404
+        });
+      } else return articles;
+    })
+    .then(articles => {
+      // if empty array and topic query is passed, checks if topic is valid
+      if (articles.length === 0 && topic) {
+        return emptyArrayIfTopicExists(topic);
+      } else if (articles.length === 0 && !author) {
         return Promise.reject({
           msg: "No articles found",
           status: 404
@@ -33,7 +59,6 @@ exports.selectArticleById = articleId => {
           status: 404
         });
       } else {
-        // spreads article to an object, changes comment_count to a string
         return commentCountToNumber(article);
       }
     });
@@ -68,14 +93,3 @@ exports.updateArticleById = (articleId, voteIncrement) => {
       } else return article;
     });
 };
-
-// exports.selectArticleById = (article_id, article_name) => {
-//     .modify(currentQuery => {
-//       if (article_name) {
-//         currentQuery.where("articles.article_id", article_id);
-//       }
-//     })
-//     .then(([article]) => {
-//       return article;
-//     });
-// };
