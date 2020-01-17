@@ -493,6 +493,18 @@ describe("/api", () => {
           .then(res => {
             expect(res.body.msg).to.equal("Author not found");
           });
+        const invalidTopicValidAuthor = request(server)
+          .get("/api/articles?topic=hello&author=butter_bridge")
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal("Topic not found");
+          });
+        const validTopicInvalidAuthor = request(server)
+          .get("/api/articles?topic=mitch&author=hello")
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal("Author not found");
+          });
         const invalidAuthorInvalidTopic = request(server)
           .get("/api/articles?author=hello&topic=hello")
           .expect(404)
@@ -504,6 +516,8 @@ describe("/api", () => {
         return Promise.all([
           validAuthorInvalidTopic,
           invalidAuthorValidTopic,
+          invalidTopicValidAuthor,
+          validTopicInvalidAuthor,
           invalidAuthorInvalidTopic
         ]);
       });
