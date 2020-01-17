@@ -14,7 +14,7 @@ describe("/api", () => {
 
   describe("/topics", () => {
     describe("GET", () => {
-      it("GET:200 responds with an array of topic objects", () => {
+      it("GET:200 / responds with an array of topic objects", () => {
         return request(server)
           .get("/api/topics")
           .expect(200)
@@ -24,22 +24,22 @@ describe("/api", () => {
           });
       });
     });
-    // describe("INVALID METHODS", () => {
-    //   it.only("STATUS:405 when an invalid method is used", () => {
-    //     const invalidMethods = ["delete"];
-    //     const methodPromises = invalidMethods.map(method => {
-    //       return request(server)
-    //         [method]("api/topics")
-    //         .expect(405)
-    //         .then(res => {
-    //           console.log(res);
-    //           expect(res.body.msg).to.equal("Method not allowed");
-    //         });
-    //     });
-    //     return Promise.all(methodPromises);
-    //   });
-    // });
+    describe("INVALID METHODS", () => {
+      it("STATUS:405 / responds status 405 when an invalid method is used", () => {
+        const invalidMethods = ["put", "patch", "post", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(server)
+            [method]("/api/topics")
+            .expect(405)
+            .then(res => {
+              expect(res.body.msg).to.equal("Method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+    });
   });
+
   describe("/users", () => {
     describe("GET", () => {
       it("GET:200 /:username responds with a user object when given a valid username that exists", () => {
@@ -63,6 +63,32 @@ describe("/api", () => {
           .then(res => {
             expect(res.body.msg).to.equal("Username not found");
           });
+      });
+    });
+    describe("INVALID METHODS", () => {
+      it("STATUS:405 / responds status 405 when an invalid method is used", () => {
+        const invalidMethods = ["get", "put", "patch", "post", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(server)
+            [method]("/api/users")
+            .expect(405)
+            .then(res => {
+              expect(res.body.msg).to.equal("Method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+      it("STATUS:405 /:username responds status 405 when an invalid method is used", () => {
+        const invalidMethods = ["put", "patch", "post", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(server)
+            [method]("/api/users/1")
+            .expect(405)
+            .then(res => {
+              expect(res.body.msg).to.equal("Method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
       });
     });
   });
@@ -539,6 +565,32 @@ describe("/api", () => {
             expect(res.body.msg).to.equal("Article not found");
           });
       });
+      describe("INVALID METHODS", () => {
+        it("STATUS:405 / responds status 405 when an invalid method is used", () => {
+          const invalidMethods = ["put", "patch", "post", "delete"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(server)
+              [method]("/api/articles")
+              .expect(405)
+              .then(res => {
+                expect(res.body.msg).to.equal("Method not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
+        });
+        it("STATUS:405 /:id responds status 405 when an invalid method is used", () => {
+          const invalidMethods = ["put", "post", "delete"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(server)
+              [method]("/api/articles/1")
+              .expect(405)
+              .then(res => {
+                expect(res.body.msg).to.equal("Method not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
+        });
+      });
     });
     describe("/:article_id", () => {
       describe("GET", () => {
@@ -776,6 +828,20 @@ describe("/api", () => {
             });
         });
       });
+      describe("INVALID METHODS", () => {
+        it("STATUS:405 /comments responds status 405 when an invalid method is used", () => {
+          const invalidMethods = ["put", "patch", "delete"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(server)
+              [method]("/api/articles/1/comments")
+              .expect(405)
+              .then(res => {
+                expect(res.body.msg).to.equal("Method not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
+        });
+      });
     });
   });
 
@@ -931,6 +997,20 @@ describe("/api", () => {
             .then(res => {
               expect(res.body.msg).to.equal("Comment not found");
             });
+        });
+      });
+      describe("INVALID METHODS", () => {
+        it("STATUS:405 /:id responds status 405 when an invalid method is used", () => {
+          const invalidMethods = ["get", "put", "post"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(server)
+              [method]("/api/comments/1")
+              .expect(405)
+              .then(res => {
+                expect(res.body.msg).to.equal("Method not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
         });
       });
     });
