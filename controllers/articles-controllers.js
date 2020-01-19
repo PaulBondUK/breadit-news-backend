@@ -3,6 +3,8 @@ const {
   selectArticleById,
   updateArticleById
 } = require("../models/articles-models");
+const { checkIfTopicExists } = require("../models/topics-models");
+const { checkIfAuthorExists } = require("../models/users-models");
 
 exports.getArticles = (req, res, next) => {
   selectArticles(

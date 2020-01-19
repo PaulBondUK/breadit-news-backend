@@ -29,3 +29,19 @@ exports.emptyArrayIfAuthorExists = username => {
       } else return [];
     });
 };
+
+exports.checkIfAuthorExists = author => {
+  if (!author) return true;
+  return database
+    .select("*")
+    .from("users")
+    .where("username", author)
+    .then(author => {
+      if (author.length === 0) {
+        return Promise.reject({
+          msg: "Author not found",
+          status: 404
+        });
+      } else return author;
+    });
+};

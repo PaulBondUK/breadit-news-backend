@@ -32,7 +32,6 @@ exports.selectArticles = (sortBy, order, author, topic) => {
       } else return articles;
     })
     .then(articles => {
-      // if empty array and topic query is passed, checks if topic is valid
       if (articles.length === 0 && topic) {
         return emptyArrayIfTopicExists(topic);
       } else if (articles.length === 0 && !author) {
@@ -79,14 +78,9 @@ exports.checkIfArticleExists = articleId => {
 };
 
 exports.updateArticleById = (articleId, voteIncrement) => {
-  console.log("inside model");
   return database("articles")
     .where("article_id", articleId)
-    .modify(currentQuery => {
-      if (voteIncrement) {
-        currentQuery.increment({ votes: voteIncrement });
-      }
-    })
+    .increment({ votes: voteIncrement || 0 })
     .returning("*")
     .then(([article]) => {
       if (!article) {

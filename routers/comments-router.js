@@ -6,7 +6,7 @@ const {
 } = require("../controllers/comments-controllers");
 const { send405Error } = require("../errors");
 
-// api/comments/:comment_id
+// /api/comments/:comment_id
 commentsRouter
   .route("/:comment_id")
   .patch(patchCommentById)

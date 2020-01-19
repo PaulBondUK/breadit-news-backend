@@ -10,20 +10,20 @@ const {
 } = require("../controllers/comments-controllers");
 const { send405Error } = require("../errors");
 
-// api/articles
+// /api/articles
 articlesRouter
   .route("/")
   .get(getArticles)
   .all(send405Error);
 
-// api/articles/:article_id
+// /api/articles/:article_id
 articlesRouter
   .route("/:article_id")
   .get(getArticleById)
   .patch(patchArticleById)
   .all(send405Error);
 
-// api/articles/:article_id/comments
+// /api/articles/:article_id/comments
 articlesRouter
   .route("/:article_id/comments")
   .get(getCommentsByArticleId)

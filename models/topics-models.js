@@ -28,3 +28,19 @@ exports.emptyArrayIfTopicExists = topic => {
       } else return [];
     });
 };
+
+exports.checkIfTopicExists = topic => {
+  if (!topic) return true;
+  return database
+    .select("*")
+    .from("topics")
+    .where("slug", topic)
+    .then(topics => {
+      if (topics.length === 0) {
+        return Promise.reject({
+          msg: "Topic not found",
+          status: 404
+        });
+      } else return topic;
+    });
+};

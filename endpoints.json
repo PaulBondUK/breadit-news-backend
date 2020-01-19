@@ -10,7 +10,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
@@ -23,5 +23,29 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an object of a single article",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": 1527695953341
+      }
+    }
+  },
+    "PATCH /api/articles/:article_id": {
+    "description": "edit",
+    "queries": [],
+    "exampleResponse": {}
   }
 }
+
+  "METHOD /api/": {
+    "description": "edit",
+    "queries": [],
+    "exampleResponse": {}
+  }
