@@ -13,7 +13,11 @@
     "test-mig-latest": "NODE_ENV='test' knex migrate:latest",
     "test-mig-rollback": "NODE_ENV='test' knex migrate:rollback",
     "mig-latest": "knex migrate:latest",
-    "mig-rollback": "knex migrate:rollback"
+    "mig-rollback": "knex migrate:rollback",
+    "seed:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex seed:run",
+    "migrate-latest:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest",
+    "migrate-rollback:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback",
+    "start": "node listen.js"
   },
   "repository": {
     "type": "git",
