@@ -37,15 +37,9 @@
       }
     }
   },
-    "PATCH /api/articles/:article_id": {
+  "PATCH /api/articles/:article_id": {
     "description": "edit",
     "queries": [],
     "exampleResponse": {}
   }
 }
-
-  "METHOD /api/": {
-    "description": "edit",
-    "queries": [],
-    "exampleResponse": {}
-  }

@@ -11,17 +11,14 @@ exports.selectArticles = (sortBy, order, author, topic) => {
     .groupBy("articles.article_id")
     .count({ comment_count: "comment_id" })
     .modify(currentQuery => {
-      // if author query is passed, this filters by author
       if (author) {
         currentQuery.where("articles.author", author);
       }
-      // if topic query is passed, this filters by topic
       if (topic) {
         currentQuery.where("articles.topic", topic);
       }
     })
     .then(articles => {
-      // if empty array and author query is passed, checks if author is valid
       if (articles.length === 0 && author) {
         return emptyArrayIfAuthorExists(author);
       } else if (articles.length === 0 && !topic) {
@@ -51,7 +48,6 @@ exports.selectArticleById = articleId => {
     .groupBy("articles.article_id")
     .count({ comment_count: "comment_id" })
     .then(([article]) => {
-      // if article returned is blank, sends an error
       if (!article) {
         return Promise.reject({
           msg: "Article not found",
@@ -84,7 +80,6 @@ exports.updateArticleById = (articleId, voteIncrement) => {
     .returning("*")
     .then(([article]) => {
       if (!article) {
-        // if article returned is blank, sends an error
         return Promise.reject({
           msg: "Article not found",
           status: 404

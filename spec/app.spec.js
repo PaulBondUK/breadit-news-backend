@@ -7,13 +7,23 @@ chai.use(require("chai-things"));
 const request = require("supertest");
 const server = require("../app");
 const database = require("../db/connection.js");
+const endpoints = require("../endpoints.json");
 
 describe("/api", () => {
   beforeEach(() => database.seed.run());
   after(() => database.destroy());
+  describe("GET", () => {
+    it("GET:200 / responds with a json file containing all of the endpoints", () => {
+      return request(server)
+        .get("/api")
+        .then(res => {
+          expect(res.body).to.eql(endpoints);
+        });
+    });
+  });
   describe("INVALID METHODS", () => {
     it("STATUS:405 /:id responds status 405 when an invalid method is used", () => {
-      const invalidMethods = ["get", "put", "post", "patch", "delete"];
+      const invalidMethods = ["put", "post", "patch", "delete"];
       const methodPromises = invalidMethods.map(method => {
         return request(server)
           [method]("/api")

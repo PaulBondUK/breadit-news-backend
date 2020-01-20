@@ -7,5 +7,3 @@ exports.getUserById = (req, res, next) => {
     })
     .catch(next);
 };
-
-// delete = res.sendStatus(204)
