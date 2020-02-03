@@ -145,6 +145,56 @@ describe("/api", () => {
             expect(res.body.articles).to.be.descendingBy("created_at");
           });
       });
+      it("GET:200 / limits to 10 items by default", () => {
+        return request(server)
+          .get("/api/articles")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(10);
+          });
+      });
+      it("GET:200 /? limits to x number of items when given a limit query", () => {
+        const limitCheckOne = request(server)
+          .get("/api/articles?limit=5")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(5);
+          });
+        const limitCheckTwo = request(server)
+          .get("/api/articles?limit=8")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(8);
+          });
+        const limitCheckThree = request(server)
+          .get("/api/articles?limit=20")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(12);
+          });
+        return Promise.all([limitCheckOne, limitCheckTwo, limitCheckThree]);
+      });
+      it("GET:200 /? returns the x page of results when given a p query", () => {
+        const pageCheckOne = request(server)
+          .get("/api/articles?limit=5&p=2")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(5);
+          });
+        const pageCheckTwo = request(server)
+          .get("/api/articles?p=2")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(2);
+          });
+        const pageCheckThree = request(server)
+          .get("/api/articles?limit=5&p=3")
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.equal(2);
+          });
+        return Promise.all([pageCheckOne, pageCheckTwo, pageCheckThree]);
+      });
       it("GET:200 /? sorts descendingly by 'created_by' when given a 'desc' order query", () => {
         return request(server)
           .get("/api/articles?order=desc")
@@ -312,7 +362,7 @@ describe("/api", () => {
           .expect(200)
           .then(res => {
             expect(res.body.articles).to.all.have.property("topic", "mitch");
-            expect(res.body.articles.length).to.equal(11);
+            expect(res.body.articles.length).to.equal(10);
           });
       });
       it("GET:200 /? responds correctly when given a topic query and a sort_by or order query, or both", () => {
@@ -321,7 +371,7 @@ describe("/api", () => {
           .expect(200)
           .then(res => {
             expect(res.body.articles).to.all.have.property("topic", "mitch");
-            expect(res.body.articles.length).to.equal(11);
+            expect(res.body.articles.length).to.equal(10);
             expect(res.body.articles).to.be.descendingBy("comment_count");
           });
         const topicQueryAndOrder = request(server)
@@ -329,7 +379,7 @@ describe("/api", () => {
           .expect(200)
           .then(res => {
             expect(res.body.articles).to.all.have.property("topic", "mitch");
-            expect(res.body.articles.length).to.equal(11);
+            expect(res.body.articles.length).to.equal(10);
             expect(res.body.articles).to.be.ascendingBy("created_at");
           });
         const topicQueryAndSortByAndOrder = request(server)
@@ -337,7 +387,7 @@ describe("/api", () => {
           .expect(200)
           .then(res => {
             expect(res.body.articles).to.all.have.property("topic", "mitch");
-            expect(res.body.articles.length).to.equal(11);
+            expect(res.body.articles.length).to.equal(10);
             expect(res.body.articles).to.be.ascendingBy("body");
           });
         return Promise.all([
@@ -513,7 +563,7 @@ describe("/api", () => {
             expect(res.body.msg).to.equal("Author not found");
           });
       });
-      it("GET:404 /? responds status 404 when given an topic query that doesn't exist in the database", () => {
+      it("GET:404 /? responds status 404 when given a topic query that doesn't exist in the database", () => {
         return request(server)
           .get("/api/articles?topic=hello")
           .expect(404)
@@ -562,6 +612,15 @@ describe("/api", () => {
           invalidAuthorInvalidTopic
         ]);
       });
+      // it.only("GET:404 /? responds status 404 when given a p query that returns no results", () => {
+      //   return request(server)
+      //     .get("/api/articles?author=butter_bridge&topic=mitch&limit=10&p=2")
+      //     .expect(404)
+      //     .then(res => {
+      //       console.log(res);
+      //       expect(res.body.msg).to.equal("Page not found");
+      //     });
+      // });
       it("GET:400 /:id responds status 400 when given an article_id integer outside of the range", () => {
         return request(server)
           .get("/api/articles/9999999999")
@@ -648,7 +707,7 @@ describe("/api", () => {
             .then(res => {
               const comments = res.body.comments;
               expect(comments).to.be.an("array");
-              expect(comments.length).to.equal(13);
+              expect(comments.length).to.equal(10);
               expect(comments).to.all.have.keys(
                 "comment_id",
                 "author",
@@ -674,7 +733,51 @@ describe("/api", () => {
               expect(res.body.comments).to.be.descendingBy("created_at");
             });
         });
-        it("GET:200 /comments sorts descendingly by 'created_by' when given a 'desc' order query", () => {
+        it("GET:200 /comments limits to 10 items by default", () => {
+          return request(server)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments.length).to.equal(10);
+            });
+        });
+        it("GET:200 /comments? limits to x number of items when given a limit query", () => {
+          const limitCheckOne = request(server)
+            .get("/api/articles/1/comments?limit=5")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments.length).to.equal(5);
+            });
+          const limitCheckTwo = request(server)
+            .get("/api/articles/1/comments?limit=8")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments.length).to.equal(8);
+            });
+          return Promise.all([limitCheckOne, limitCheckTwo]);
+        });
+        it.only("GET:200 /comments? returns the x page of results when given a p query", () => {
+          const pageCheckOne = request(server)
+            .get("/api/articles/1/comments?limit=5&p=2")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments.length).to.equal(5);
+            });
+          const pageCheckTwo = request(server)
+            .get("/api/articles/1/comments?p=2")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments.length).to.equal(3);
+            });
+          const pageCheckThree = request(server)
+            .get("/api/articles/1/comments?limit=5&p=3")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments.length).to.equal(3);
+            });
+          return Promise.all([pageCheckOne, pageCheckTwo, pageCheckThree]);
+        });
+        it("GET:200 /comments? sorts descendingly by 'created_by' when given a 'desc' order query", () => {
           return request(server)
             .get("/api/articles/1/comments?order=desc")
             .expect(200)
@@ -682,7 +785,7 @@ describe("/api", () => {
               expect(res.body.comments).to.be.descendingBy("created_at");
             });
         });
-        it("GET:200 /comments sorts descendingly by any column when given any valid column name as a sort_by query", () => {
+        it("GET:200 /comments? sorts descendingly by any column when given any valid column name as a sort_by query", () => {
           const queries = [
             "comment_id",
             "author",
@@ -700,7 +803,7 @@ describe("/api", () => {
           });
           return Promise.all(testPromises);
         });
-        it("GET:200 /comments sorts ascendingly by 'created_by' when given an 'asc' order query", () => {
+        it("GET:200 /comments? sorts ascendingly by 'created_by' when given an 'asc' order query", () => {
           return request(server)
             .get("/api/articles/1/comments?order=asc")
             .expect(200)
@@ -708,7 +811,7 @@ describe("/api", () => {
               expect(res.body.comments).to.be.ascendingBy("created_at");
             });
         });
-        it("GET:200 /comments sorts ascendingly by any column when given any valid column name as a sort_by query and an 'asc' order query", () => {
+        it("GET:200 /comments? sorts ascendingly by any column when given any valid column name as a sort_by query and an 'asc' order query", () => {
           const queries = [
             "comment_id",
             "author",
@@ -787,38 +890,6 @@ describe("/api", () => {
               expect(res.body.msg).to.equal("Bad Request");
             });
         });
-        it("GET:400 /comments responds status 400 when given when given an invalid column name as a 'sort_by' query", () => {
-          return request(server)
-            .get("/api/articles/1/comments?sort_by=hello")
-            .expect(400)
-            .then(res => {
-              expect(res.body.msg).to.equal("Bad Request");
-            });
-        });
-        it("GET:400 /comments responds status 400 when given when given an invalid order query", () => {
-          return request(server)
-            .get("/api/articles/1/comments?order=disc")
-            .expect(400)
-            .then(res => {
-              expect(res.body.msg).to.equal("Bad Request");
-            });
-        });
-        it("GET:400 /comments responds status 400 when given when given an invalid column name as a sort_by query and a valid 'order' query", () => {
-          return request(server)
-            .get("/api/articles/1/comments?sort_by=hello&?order=asc")
-            .expect(400)
-            .then(res => {
-              expect(res.body.msg).to.equal("Bad Request");
-            });
-        });
-        it("GET:400 /comments responds status 400 when given when given a valid sort_by query and an invalid 'order' query", () => {
-          return request(server)
-            .get("/api/articles/1/comments?sort_by=votes&order=disc")
-            .expect(400)
-            .then(res => {
-              expect(res.body.msg).to.equal("Bad Request");
-            });
-        });
         it("GET:404 /comments responds status 404 when given a valid article_id that doesn't exist in the database", () => {
           return request(server)
             .get("/api/articles/999999999/comments")
@@ -827,6 +898,54 @@ describe("/api", () => {
               expect(res.body.msg).to.equal("Article not found");
             });
         });
+        it("GET:400 /comments? responds status 400 when given when given an invalid column name as a 'sort_by' query", () => {
+          return request(server)
+            .get("/api/articles/1/comments?sort_by=hello")
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.equal("Bad Request");
+            });
+        });
+        it("GET:400 /comments? responds status 400 when given when given an invalid order query", () => {
+          return request(server)
+            .get("/api/articles/1/comments?order=disc")
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.equal("Bad Request");
+            });
+        });
+        it("GET:400 /comments? responds status 400 when given when given an invalid column name as a sort_by query and a valid 'order' query", () => {
+          return request(server)
+            .get("/api/articles/1/comments?sort_by=hello&?order=asc")
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.equal("Bad Request");
+            });
+        });
+        it("GET:400 /comments? responds status 400 when given when given a valid sort_by query and an invalid 'order' query", () => {
+          return request(server)
+            .get("/api/articles/1/comments?sort_by=votes&order=disc")
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.equal("Bad Request");
+            });
+        });
+        // it("GET:400 comments/? responds status 400 when given an invalid p query", () => {
+        //   return request(server)
+        //     .get("/api/articles/1/comments?p=hello")
+        //     .expect(400)
+        //     .then(res => {
+        //       expect(res.body.msg).to.equal("Bad Request");
+        //     });
+        // });
+        // it("GET:400 comments/? responds status 400 when given an invalid limit query", () => {
+        //   return request(server)
+        //     .get("/api/articles/1/comments?limit=hello")
+        //     .expect(400)
+        //     .then(res => {
+        //       expect(res.body.msg).to.equal("Bad Request");
+        //     });
+        // });
         it("POST:400 /comments responds status 400 when no comment object is given", () => {
           return request(server)
             .post("/api/articles/1/comments")

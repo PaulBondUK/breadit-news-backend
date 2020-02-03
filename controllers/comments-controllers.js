@@ -9,7 +9,9 @@ exports.getCommentsByArticleId = (req, res, next) => {
   selectCommentsByArticleId(
     req.params.article_id,
     req.query.sort_by,
-    req.query.order
+    req.query.order,
+    req.query.limit,
+    req.query.p
   )
     .then(comments => {
       res.status(200).send({ comments });

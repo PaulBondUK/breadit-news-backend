@@ -7,12 +7,8 @@ const { checkIfTopicExists } = require("../models/topics-models");
 const { checkIfAuthorExists } = require("../models/users-models");
 
 exports.getArticles = (req, res, next) => {
-  selectArticles(
-    req.query.sort_by,
-    req.query.order,
-    req.query.author,
-    req.query.topic
-  )
+  const { sort_by, order, author, topic, limit, p } = req.query;
+  selectArticles(sort_by, order, author, topic, limit, p)
     .then(articles => {
       res.status(200).send({ articles });
     })

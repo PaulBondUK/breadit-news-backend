@@ -3,9 +3,11 @@ const { commentCountToNumber } = require("../db/utils/utils.js");
 const { emptyArrayIfAuthorExists } = require("./users-models");
 const { emptyArrayIfTopicExists } = require("./topics-models");
 
-exports.selectArticles = (sortBy, order, author, topic) => {
+exports.selectArticles = (sortBy, order, author, topic, limit = 10, page) => {
   return database("articles")
     .select("articles.*")
+    .limit(limit)
+    .offset(page ? (page - 1) * limit : 0)
     .orderBy(sortBy || "created_at", order || "desc")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
@@ -21,21 +23,11 @@ exports.selectArticles = (sortBy, order, author, topic) => {
     .then(articles => {
       if (articles.length === 0 && author) {
         return emptyArrayIfAuthorExists(author);
-      } else if (articles.length === 0 && !topic) {
-        return Promise.reject({
-          msg: "No articles found",
-          status: 404
-        });
       } else return articles;
     })
     .then(articles => {
       if (articles.length === 0 && topic) {
         return emptyArrayIfTopicExists(topic);
-      } else if (articles.length === 0 && !author) {
-        return Promise.reject({
-          msg: "No articles found",
-          status: 404
-        });
       } else return commentCountToNumber(articles);
     });
 };
@@ -87,3 +79,10 @@ exports.updateArticleById = (articleId, voteIncrement) => {
       } else return article;
     });
 };
+
+// function checkIfArticlesPageExists(limit, page) {
+//   const numberOfArticlesNeeded = limit * (page - 1);
+//   return database("articles").select("*").then(articles => {
+//     if (articles.length > numberOfArticlesNeeded)
+//   });
+// }

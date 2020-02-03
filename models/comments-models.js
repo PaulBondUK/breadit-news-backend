@@ -1,7 +1,13 @@
 const database = require("../db/connection");
 const { checkIfArticleExists } = require("./articles-models.js");
 
-exports.selectCommentsByArticleId = (articleId, sortBy, order) => {
+exports.selectCommentsByArticleId = (
+  articleId,
+  sortBy,
+  order,
+  limit = 10,
+  page = 1
+) => {
   if (order && order !== "asc" && order !== "desc") {
     return Promise.reject({
       msg: "Bad Request",
@@ -10,6 +16,8 @@ exports.selectCommentsByArticleId = (articleId, sortBy, order) => {
   } else {
     return database("comments")
       .select("comment_id", "author", "votes", "created_at", "body")
+      .limit(limit)
+      .offset(page > 1 ? (page - 1) * limit : 1)
       .where("article_id", articleId)
       .orderBy(sortBy || "created_at", order || "desc")
       .then(comments => {
