@@ -17,7 +17,7 @@ exports.selectCommentsByArticleId = (
     return database("comments")
       .select("comment_id", "author", "votes", "created_at", "body")
       .limit(limit)
-      .offset(page > 1 ? (page - 1) * limit : 1)
+      .offset(page > 1 ? (page - 1) * limit : 0)
       .where("article_id", articleId)
       .orderBy(sortBy || "created_at", order || "desc")
       .then(comments => {

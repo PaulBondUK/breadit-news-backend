@@ -756,7 +756,7 @@ describe("/api", () => {
             });
           return Promise.all([limitCheckOne, limitCheckTwo]);
         });
-        it.only("GET:200 /comments? returns the x page of results when given a p query", () => {
+        it("GET:200 /comments? returns the x page of results when given a p query", () => {
           const pageCheckOne = request(server)
             .get("/api/articles/1/comments?limit=5&p=2")
             .expect(200)
