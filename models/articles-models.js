@@ -8,7 +8,10 @@ exports.selectArticles = (sortBy, order, author, topic, limit = 10, page) => {
     .select("articles.*")
     .limit(limit)
     .offset(page ? (page - 1) * limit : 0)
-    .orderBy(sortBy || "created_at", order || "desc")
+    .orderBy([
+      { column: sortBy || "created_at", order: order || "desc" },
+      { column: "created_at", order: "desc" }
+    ])
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
     .count({ comment_count: "comment_id" })
