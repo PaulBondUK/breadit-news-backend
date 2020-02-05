@@ -1,16 +1,19 @@
 const {
   selectArticles,
   selectArticleById,
-  updateArticleById
+  updateArticleById,
+  countArticles
 } = require("../models/articles-models");
 const { checkIfTopicExists } = require("../models/topics-models");
 const { checkIfAuthorExists } = require("../models/users-models");
 
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, author, topic, limit, p } = req.query;
-  selectArticles(sort_by, order, author, topic, limit, p)
-    .then(articles => {
-      res.status(200).send({ articles });
+  const articles = selectArticles(sort_by, order, author, topic, limit, p);
+  const total_count = countArticles(author, topic);
+  Promise.all([articles, total_count])
+    .then(([articles, total_count]) => {
+      res.status(200).send({ articles, total_count });
     })
     .catch(next);
 };

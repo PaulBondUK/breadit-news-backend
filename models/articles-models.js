@@ -35,6 +35,22 @@ exports.selectArticles = (sortBy, order, author, topic, limit = 10, page) => {
     });
 };
 
+exports.countArticles = (author, topic) => {
+  return database("articles")
+    .count("*")
+    .modify(currentQuery => {
+      if (author) {
+        currentQuery.where("articles.author", author);
+      }
+      if (topic) {
+        currentQuery.where("articles.topic", topic);
+      }
+    })
+    .then(([{ count: articleCount }]) => {
+      return parseInt(articleCount);
+    });
+};
+
 exports.selectArticleById = articleId => {
   return database("articles")
     .select("articles.*")
