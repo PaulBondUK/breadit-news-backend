@@ -14,7 +14,7 @@ It was created as a back-end project while studying at [Northcoders](https://www
 
 ## Technologies
 
-Breadit was created using Node.js, Express.js, PostgreSQL, and Knex, with full TDD (Chai + Supertest).
+RESTful API created using Node.js, Express.js, PostgreSQL, and Knex, with full TDD (Chai + Supertest).
 
 ## Contact
 
